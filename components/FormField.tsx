@@ -16,14 +16,14 @@ interface FormFieldProps <T extends FieldValues>{
 const FormField = ({control , name ,label , placeholder,type}:FormFieldProps<T>) => {
   return (
     <Controller
-
+      
         control={control}
         name={name}
         render={({ field }) => (
-          <FormItem>
+          <FormItem className=''>
             <FormLabel className='label'>{label}</FormLabel>
             <FormControl>
-              <Input type={type} placeholder={placeholder} {...field} />
+              <Input className='py-5 rounded-full' type={type} placeholder={placeholder} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>

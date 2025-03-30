@@ -36,8 +36,6 @@ const AuthForm = ({type}:{type:string}) => {
   const router=useRouter(); 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        
-        
       })
       function onSubmit(values: z.infer<typeof formSchema>) {
         try{
@@ -70,12 +68,12 @@ const AuthForm = ({type}:{type:string}) => {
 
         
     <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6  ">
         {!isSignin && 
         <FormField label='Name' type='text' control={form.control} placeholder="Name"  name='name' ></FormField>}
         <FormField label='Email' type='email' control={form.control} placeholder='Email' name='email'></FormField>
         <FormField label='Password' type='password' control={form.control} placeholder='Password' name='password'></FormField>
-      <Button type="submit">Submit</Button>
+      <Button className='' type="submit">Submit</Button>
     </form>
   </Form>
 
