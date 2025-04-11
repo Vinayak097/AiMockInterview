@@ -25,11 +25,10 @@ export default function Page() {
 
     <section className=" flex flex-col gap-6 mt-8 ">
       <h2>Your interviews</h2>
-      <div className="interviews-section">
-        <p>{dummyInterviews.map((interview)=>{
+      <div className="interview-section">
+        <div>{dummyInterviews.map((interview)=>{
           return <InterviewCard key={interview.id} {...interview}></InterviewCard>
-        })}</p>
-
+        })}</div>
         <p>You haven&apos;t taken any interviws yet </p>
       </div>
     </section>

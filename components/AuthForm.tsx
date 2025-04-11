@@ -19,6 +19,9 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import FormField from './FormField'
 import { useRouter } from 'next/navigation'
+import { createUserWithEmailAndPassword, signInWithCredential, signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '@/firebase/client'
+import { Signin, Signup } from '@/actions/auth.action'
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
@@ -37,22 +40,46 @@ const AuthForm = ({type}:{type:string}) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
       })
-      function onSubmit(values: z.infer<typeof formSchema>) {
+      async function onSubmit(values: z.infer<typeof formSchema>) {
         try{
           if(type=='sign-up'){
+            const {name,email,password}=values;
+            const userCredential=await createUserWithEmailAndPassword(auth,email,password)
+            const result= await Signup({uid:userCredential.user.uid,name:name!,email,password});
+            if(!result?.success){
+              toast.error(result?.message)
+              return;
+            }
+            
             toast.success('Account created successfully')
-            router.push('/');
+            router.push('/') ;
             console.log("singup"  , values)
 
           }else{
+            const {email,password}=values;
+            const userCredential=await signInWithEmailAndPassword(auth,email,password);
+            const idToken=await userCredential.user.getIdToken();
+            if(!idToken){
+              toast.error('Something went wrong')
+              return;
+            }
+            await Signin({email, idToken})            
             toast.success('Signin successfully')
             router.push('/');
             console.log('singin ' , values)
 
           }
-        }catch(e){
-          console.error(e)
-          toast.error(`there was an error : ${e}`)
+        }catch(e:any){
+          if (e.code === 'auth/email-already-in-use') {
+            toast.error('Email already in use');
+          } else if (e.code === 'auth/weak-password') {
+            toast.error('Password should be at least 6 characters');
+          } else if (e.code === 'auth/invalid-email') {
+            toast.error('Invalid email address');
+          } else {
+            toast.error(e.message);
+          }
+          console.error('Authentication error:', e);
         }
         
       }
@@ -86,7 +113,6 @@ const AuthForm = ({type}:{type:string}) => {
             {isSignin ? "Sign Up" : "Sign In"}
           </Link>
         </p>
-
   </div>
   </div>
   )

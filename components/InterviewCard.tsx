@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getRandomInterviewCover } from '@/prepwise_public/prepwise_public/utils';
 import { Button } from './ui/button';
 import Link from 'next/link';
+import TechIcons from './TechIcons';
 const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}:InterviewCardProps) => {
     const feedback=null as Feedback |null
     const normelizedType=/mix/gi.test(type)? 'Mixed':type;
@@ -12,12 +13,12 @@ const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}:Interv
     <div className='card-border w-[300px] max-sm:w-full min-h-96' >
         <div className='card-interview'>
             <div className=''>
-            <div className='absolute top-0 righ-0 w-fit px-4 py-2 rounded-bl-lg bg-light-600'>
-                <p className='batch-text'>
+            <div className='absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg bg-light-600'>
+                <p className='badge-text'>
                     {normelizedType}
                 </p>
             </div>
-            <Image src={getRandomInterviewCover()} alt='coverinterveiw image' height={96} width={96} 
+            <Image src={getRandomInterviewCover()} alt='coverinterview image' height={90} width={90} 
             className='rounded-full object-fit size-[90px]' >
             </Image>
             <h3 className='mt-5 capitalize'>
@@ -25,11 +26,12 @@ const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}:Interv
             </h3>
             <div className=' flex flex-row gap-5 mt-3'>
                 <div className='flex flex-row gap-2 '>
-                    <Image src={'/calender.svg'} alt='calender'
+                    <Image src={'/calendar.svg'} alt='calender'
                     width={22} height={22}></Image>
+                    <p>{formattedDate}</p>
                 </div>
                 <div className='flex flex-row gap-2 items-center'>
-                    <Image src="/start.svg" alt="star" width={22} height={22}></Image>
+                    <Image src="/star.svg" alt="star" width={22} height={22}></Image>
                     <p>{feedback?.totalScore || '-----'}/100</p>
                 </div>
             </div>
@@ -39,8 +41,8 @@ const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}:Interv
             </p>
             </div>
 
-            <div className='flex flex '>
-                <p>Tech icons</p>
+            <div className='flex flex justify-between '>
+                <TechIcons techStack={techstack}></TechIcons>
 
                 <Button className='btn-primary'>
                     <Link href={feedback? `/interview/${interviewId}/feedback`:
