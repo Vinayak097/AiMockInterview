@@ -49,13 +49,14 @@ export async function setSessionCookies(idToken:string){
 export async function Signin(params:SignInParams){
     const {email,idToken}=params;
     try{
-        const userRecord= await auth.getUser(email);
+        const userRecord= await auth.getUserByEmail(email);
         if(!userRecord){
             return{
                 success:false,
                 message:'User does not exist , create an account'
             }
         }
+        
         await setSessionCookies(idToken);
     }catch(e){
         console.log(e ,'signin function')
@@ -64,14 +65,18 @@ export async function Signin(params:SignInParams){
 }
 
 export async function getCurrentUser():Promise<User|null>{
+    
     const cookieSession=await cookies();
     const sessionCookie=cookieSession.get('session')?.value;
+    
     if(!sessionCookie){
         return null;
     }
     try{
         const decodeToken=await auth.verifySessionCookie(sessionCookie,true);
+    
         const userRecord =await db.collection('users').doc(decodeToken.uid).get();
+    
         if(!userRecord) return null;
         return {...userRecord.data(),id:userRecord.id} as User;
     }catch(e){

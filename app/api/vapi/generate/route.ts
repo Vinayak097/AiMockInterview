@@ -9,6 +9,7 @@ export async function GET(){
 }
 
 export async function POST(req:Request){
+    console.log('generate interview ')
     const {type,role,level,techstack,amount,userid}=await req.json();
      try{
         const {text:questions}=await generateText({

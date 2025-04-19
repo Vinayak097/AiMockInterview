@@ -1,18 +1,91 @@
+'use client'
 import { cn } from '@/lib/utils';
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import Vapi from "@vapi-ai/web";
+import { useRouter } from 'next/navigation';
+import { vapi } from '@/lib/vapi.sdk';
+
 enum CallStatus{
     INACTIVE='INACTIVE',
     ACTIVE='ACTIVE',
     CONNECTING='CONNECTING',
     FINISHED='FINISHED'
 }
+interface SavedMessages{
+    role:'user'|'system'|'assistant',
+    content:string
+}
 const Agent = ({userName,userId,type}:AgentProps) => {
-    const isSpeaking=true;
-    const callStatus=CallStatus.INACTIVE;
-    const messages=['whats your name?' , 'My name is john Doe , nice to meet you!']
+    const router=useRouter()
+    const [isSpeaking,setisSpeaking]=React.useState(false)  
+    const [callStatus, setCallstatus]=useState(CallStatus.INACTIVE)
+    const [messages,setMessages]=useState<SavedMessages[]>([])
+    
+    useEffect(()=>{
+        const oncallStart=()=>setCallstatus(CallStatus.ACTIVE)
+        const oncallEnd=()=>setCallstatus(CallStatus.INACTIVE);
 
-    const lastMessages=messages[messages.length-1]
+        const onMessage=(message:Message)=>{
+            if(message.type=='transcript' && message.transcriptType=='final'){
+                const newMessage={role:message.role,content:message.transcript}
+                setMessages((prev)=>[...prev,newMessage])
+            }
+        }
+
+        const onSpeechStart=()=>setisSpeaking(true)
+        const onSpeechEnd=()=>setisSpeaking(false)
+        const onError=(e:Error)=>console.log(e, 'error in agenet')
+
+        vapi.on('call-start',oncallStart)
+        vapi.on('call-end' , oncallEnd)
+        vapi.on('message' , onMessage)
+        vapi.on('speech-start',onSpeechStart)
+        vapi.on('speech-end',onSpeechEnd)
+        vapi.on('error',onError)    
+
+        return   ()=>{
+            vapi.off('call-start',oncallStart)
+            vapi.off('call-end' , oncallEnd)
+            vapi.off('message' , onMessage)
+            vapi.off('speech-start',onSpeechStart)
+            vapi.off('speech-end',onSpeechEnd)
+            vapi.off('error',onError)
+        }
+    },[])
+
+    useEffect(()=>{
+        if(callStatus===CallStatus.FINISHED){
+            router.push('/')
+        }
+    },[messages,callStatus,userId,type])
+
+    const handleCall=()=>{
+        console.log('caling');
+        setCallstatus(CallStatus.CONNECTING)
+        try{
+
+            vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!,{variableValues :{
+                userid:userId,
+                userName
+            }})
+
+        }catch(e){
+            console.log(e, 'vapi start')
+            setCallstatus(CallStatus.INACTIVE)
+        }
+        
+        console.log("callsas")
+    }
+    const handleDisconnect=()=>{
+        setCallstatus(CallStatus.FINISHED)
+        vapi.stop()
+    }
+
+    const isInactiveorFinished=callStatus===CallStatus.INACTIVE || callStatus===CallStatus.FINISHED;
+
+
+    const lastMessages=messages[messages.length-1]?.content
   return (
 <>
     <div className='call-view'>
@@ -47,16 +120,16 @@ const Agent = ({userName,userId,type}:AgentProps) => {
     )}
     <div className='w-full flex justify-center'>
         {callStatus !=='ACTIVE' ? (
-            <button className='relative btn-call'><span className={cn('absolute animate-spin rounded-4 opacity-75',
+            <button onClick={handleCall} className='relative btn-call'><span className={cn('absolute animate-spin rounded-4 opacity-75',
                 callStatus!=='CONNECTING' && 'hidden'
-            )}>
+            )} >
                 
             </span>
-            <span>{callStatus==='INACTIVE' ||callStatus==='FINISHED'  ?'CALL' :'....'}</span>
+            <span>{isInactiveorFinished  ?'CALL' :'....'}</span>
            
             </button>
         ):(
-            <button className='btn-disconnect'>
+            <button className='btn-disconnect' onClick={handleDisconnect}>
                 End
             </button>
         )}

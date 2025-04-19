@@ -1,11 +1,17 @@
+import { getCurrentUser } from '@/actions/auth.action'
 import Agent from '@/components/Agent'
+import { redirect } from 'next/navigation';
 import React from 'react'
 
-const page = () => {
+const page = async() => {
+  const user =await getCurrentUser();
+  if(!user){
+    redirect('/sign-in')
+  }
   return (
     <>
     <div>Interview page </div>
-    <Agent userName='You' userId="user1" type='generate'></Agent>
+    <Agent userName={user?.name} userId={user?.id} type='generate'></Agent>
     </>
   )
 }
