@@ -76,7 +76,7 @@ export async function getCurrentUser():Promise<User|null>{
         const decodeToken=await auth.verifySessionCookie(sessionCookie,true);
     
         const userRecord =await db.collection('users').doc(decodeToken.uid).get();
-    
+        console.log(userRecord , 'user')
         if(!userRecord) return null;
         return {...userRecord.data(),id:userRecord.id} as User;
     }catch(e){

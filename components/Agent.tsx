@@ -64,7 +64,7 @@ const Agent = ({userName,userId,type}:AgentProps) => {
         console.log('caling');
         setCallstatus(CallStatus.CONNECTING)
         try{
-
+            
             vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!,{variableValues :{
                 userid:userId,
                 userName
