@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import Vapi from "@vapi-ai/web";
 import { useRouter } from 'next/navigation';
 import { vapi } from '@/lib/vapi.sdk';
+import { interviewer } from '@/constants';
 
 enum CallStatus{
     INACTIVE='INACTIVE',
@@ -16,7 +17,7 @@ interface SavedMessages{
     role:'user'|'system'|'assistant',
     content:string
 }
-const Agent = ({userName,userId,type}:AgentProps) => {
+const Agent = ({userName,userId,type,questions,interviewId}:AgentProps) => {
     const router=useRouter()
     const [isSpeaking,setisSpeaking]=React.useState(false)  
     const [callStatus, setCallstatus]=useState(CallStatus.INACTIVE)
@@ -53,22 +54,60 @@ const Agent = ({userName,userId,type}:AgentProps) => {
             vapi.off('error',onError)
         }
     },[])
+    const handleGenerateFeedback= async (message:SavedMessages[])=>{
+        console.log('Generate feedback here');
+        const {success ,id }={
+            success:true,
+            id:'feedback-id'
+        }   
 
+        if(success && id ){
+            router.push(`/interview${interviewId}/feedback`)
+        }else{
+            console.log('Error saving feedback')
+            router.push('/')
+        }
+
+    }
     useEffect(()=>{
+        if(callStatus===CallStatus.FINISHED){
+            if(type=='generate'){
+                router.push('/')
+            }else{
+                handleGenerateFeedback(messages)
+            }
+        }
         if(callStatus===CallStatus.FINISHED){
             router.push('/')
         }
     },[messages,callStatus,userId,type])
 
-    const handleCall=()=>{
+    const handleCall= async ()=>{
         console.log('caling');
         setCallstatus(CallStatus.CONNECTING)
+        
         try{
+            if(type=='generate'){
+                await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!,{variableValues :{
+                    userid:userId,
+                    userName
+                }})
             
-            vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!,{variableValues :{
-                userid:userId,
-                userName
-            }})
+            }else{
+                let formattedquestions=['']
+                if(questions){
+                    formattedquestions=questions
+                    .map((question=>`- ${question}`))
+                    
+                }
+                await vapi.start(interviewer ,{
+                    variableValues:{
+                        questions:formattedquestions
+                    }
+                })
+            }
+            
+            
 
         }catch(e){
             console.log(e, 'vapi start')
@@ -77,6 +116,7 @@ const Agent = ({userName,userId,type}:AgentProps) => {
         
         console.log("callsas")
     }
+    
     const handleDisconnect=()=>{
         setCallstatus(CallStatus.FINISHED)
         vapi.stop()

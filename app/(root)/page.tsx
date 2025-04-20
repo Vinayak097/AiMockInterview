@@ -1,4 +1,5 @@
-import { getCurrentUser, getInterviewByuserId, getLatestInterviews } from "@/actions/auth.action";
+import { getCurrentUser} from "@/actions/auth.action";
+import { getInterviewByuserId, getLatestInterviews } from "@/actions/genera.action";
 import InterviewCard from "@/components/InterviewCard";
 import { Button } from "@/components/ui/button";
 import { dummyInterviews } from "@/constants";
@@ -52,7 +53,7 @@ export default async function Page() {
    
       <div className="interviews-section">
       {
-          latestInterviews ?( <div>  {latestInterviews.map((interview:Interview)=>{
+          hasUpcomingInterviews ?( <div>  {latestInterviews.map((interview:Interview)=>{
             return <InterviewCard key={interview.id} {...interview}></InterviewCard>
           })}</div>):(<p>No Interviews available</p>)
         }

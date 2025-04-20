@@ -5,7 +5,7 @@ import { getRandomInterviewCover } from '@/lib/utils';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import TechIcons from './TechIcons';
-const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}:InterviewCardProps) => {
+const InterviewCard = ({id,userId,role,type,techstack,createdAt}:InterviewCardProps) => {
     const feedback=null as Feedback |null
     const normelizedType=/mix/gi.test(type)? 'Mixed':type;
     const formattedDate= dayjs(feedback?.createdAt || createdAt ||Date.now()).format('MMM D, YYYY')
@@ -19,7 +19,7 @@ const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}:Interv
                 </p>
             </div>
             <Image src={getRandomInterviewCover()} alt='coverinterview image' height={90} width={90} 
-            className='rounded-full object-fit size-[90px]' >
+            className='rounded-full object-fit size-[90px]'>
             </Image>
             <h3 className='mt-5 capitalize'>
                 {role} Interview
@@ -45,8 +45,8 @@ const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}:Interv
                 <TechIcons techStack={techstack}></TechIcons>
 
                 <Button className='btn-primary'>
-                    <Link href={feedback? `/interview/${interviewId}/feedback`:
-                    `/interview/${interviewId}`
+                    <Link href={feedback? `/interview/${id}/feedback`:
+                    `/interview/${id}`
                 }>
                     {feedback? 'Check Feedback':'View Interview'}
                 </Link>
