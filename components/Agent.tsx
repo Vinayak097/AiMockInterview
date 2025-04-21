@@ -6,6 +6,7 @@ import Vapi from "@vapi-ai/web";
 import { useRouter } from 'next/navigation';
 import { vapi } from '@/lib/vapi.sdk';
 import { interviewer } from '@/constants';
+import { createFeedback } from '@/actions/genera.action';
 
 enum CallStatus{
     INACTIVE='INACTIVE',
@@ -19,6 +20,8 @@ interface SavedMessages{
 }
 const Agent = ({userName,userId,type,questions,interviewId}:AgentProps) => {
     const router=useRouter()
+    
+    
     const [isSpeaking,setisSpeaking]=React.useState(false)  
     const [callStatus, setCallstatus]=useState(CallStatus.INACTIVE)
     const [messages,setMessages]=useState<SavedMessages[]>([])
@@ -55,14 +58,20 @@ const Agent = ({userName,userId,type,questions,interviewId}:AgentProps) => {
         }
     },[])
     const handleGenerateFeedback= async (message:SavedMessages[])=>{
+        if (!interviewId || !userId) {
+            console.error('Missing interviewId or userId');
+            router.push('/');
+            return;
+        }
         console.log('Generate feedback here');
-        const {success ,id }={
-            success:true,
-            id:'feedback-id'
-        }   
-
+        const {success ,feedbackId:id }=await createFeedback({
+            interviewId:interviewId||'',
+            userId:userId||'',
+            transcript:message,
+            
+        }   )
         if(success && id ){
-            router.push(`/interview${interviewId}/feedback`)
+            router.push(`/interview/${interviewId}/feedback`)
         }else{
             console.log('Error saving feedback')
             router.push('/')

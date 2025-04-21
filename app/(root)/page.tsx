@@ -11,6 +11,7 @@ export default async function Page() {
   const user=await  getCurrentUser();
   
   const [userInterviews,latestInterviews]= await Promise.all([await getInterviewByuserId(( user)?.id!) ,
+
   await getLatestInterviews({userId :( user?.id!)})])
 
   const hasInterview=userInterviews.length!=0;

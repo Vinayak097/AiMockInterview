@@ -12,6 +12,7 @@ const page = async({params}:RouteParams) => {
   const user=await getCurrentUser()
     const {id}= await params;
     const interview=await getInterviewById(id);
+    console.log(interview)
     if(!interview){
         redirect('/')
     }
@@ -28,7 +29,7 @@ const page = async({params}:RouteParams) => {
         </div>
         <p className='bg-dark-200 px-4 py-2 rounded-lg h-fit capitalize'>{interview.type}</p>
     </div>
-    <Agent userName={user.name} userId={user?.id} type={interview.type}></Agent>
+    <Agent userName={user.name} userId={user?.id} type={'interview'} questions={interview.questions} interviewId={interview.id}></Agent>
     </>
     
   )
