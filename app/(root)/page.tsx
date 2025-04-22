@@ -40,9 +40,9 @@ export default async function Page() {
 
     <section className=" flex flex-col gap-6 mt-8 ">
       <h2>Your interviews</h2>
-      <div className="interview-section">
+      <div className="">
         {
-          hasInterview ?( <div >   {userInterviews.map((interview:Interview)=>{
+          hasInterview ?( <div  className="interviews-section">   {userInterviews.map((interview:Interview)=>{
             return <InterviewCard key={interview.id} {...interview}></InterviewCard>
           })}</div>):(<p>You haven&apos;t taken any interviws yet </p>)
         }
@@ -52,13 +52,12 @@ export default async function Page() {
     <section className="flex flex-col gap-6 mt-8 ">
     <h2>Take an interview</h2>
    
-      <div className="interviews-section">
+      <div className="">
       {
-          hasUpcomingInterviews ?( <div>  {latestInterviews.map((interview:Interview)=>{
+          hasUpcomingInterviews ?( <div className="interviews-section">  {latestInterviews.map((interview:Interview)=>{
             return <InterviewCard key={interview.id} {...interview}></InterviewCard>
           })}</div>):(<p>No Interviews available</p>)
         }
-      
       </div>
     </section>
     </>
