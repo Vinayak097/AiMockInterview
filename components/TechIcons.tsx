@@ -1,10 +1,10 @@
 import { cn } from '@/lib/utils'
 import { getTechLogos } from '@/lib/utils'
 import Image from 'next/image'
-import React from 'react'
+import React, { memo } from 'react'
 
 const TechIcons = async({techStack}:TechIconProps) => {
-  console.log(techStack)
+  
     const techIcons=await getTechLogos(techStack)
   return (
     <div className='flex flex-row'>{techIcons.slice(0,3).map(({tech,url},index)=>(
@@ -21,4 +21,4 @@ const TechIcons = async({techStack}:TechIconProps) => {
   )
 }
 
-export default TechIcons
+export default memo(TechIcons)

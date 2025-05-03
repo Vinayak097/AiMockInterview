@@ -20,7 +20,7 @@ interface SavedMessages{
 }
 const Agent = ({userName,userId,type,questions,interviewId}:AgentProps) => {
     const router=useRouter()
-    
+    console.log(interviewId ,  'agenet int4eview id ');
     
     const [isSpeaking,setisSpeaking]=React.useState(false)  
     const [callStatus, setCallstatus]=useState(CallStatus.INACTIVE)
@@ -65,8 +65,8 @@ const Agent = ({userName,userId,type,questions,interviewId}:AgentProps) => {
         }
         console.log('Generate feedback here');
         const {success ,feedbackId:id }=await createFeedback({
-            interviewId:interviewId||'',
-            userId:userId||'',
+            interviewId:interviewId,
+            userId:userId,
             transcript:message,
             
         }   )

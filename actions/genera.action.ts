@@ -44,7 +44,12 @@ export async function getInterviewById(id:string):Promise<Interview |null>{
 
 export async function createFeedback(params:CreateFeedbackParams){
     const {interviewId,userId ,transcript}=params;
-
+    if(!interviewId){
+        return {
+            success:false,
+            
+        }
+    }
     try{
         const formattedTranscript =transcript
         .map((sentence:{role:string; content:string})=>(
@@ -96,7 +101,11 @@ export async function createFeedback(params:CreateFeedbackParams){
 
 }
 export async function getFeedbackById(params:GetFeedbackByInterviewIdParams){
+    console.log("feebackd get " , params)
     const {interviewId,userId}=params;
+    if(!interviewId){
+        return null
+    }
     try{
         const feedback=await db.collection('feedback')
         .where('interviewId','==',interviewId)
@@ -104,6 +113,7 @@ export async function getFeedbackById(params:GetFeedbackByInterviewIdParams){
         .limit(1)
         .get();
         const feedBack=feedback.docs[0];
+        console.log(feedBack)
         return {
             id:feedBack.id,
             ...feedBack.data()

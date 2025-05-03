@@ -4,17 +4,19 @@ import { Button } from '@/components/ui/button';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
+import { redirect,  } from 'next/navigation';
 import React from 'react'
 
-const page = async(params:RouteParams) => {
+const page = async({params}:RouteParams) => {
+    console.log("params  ", params)
+    const {id}= await params;
     
-    const id=await params.params;
+
     const user =await getCurrentUser()
     if(!user) redirect('/sign-in')
-    const interview=await getInterviewById(id.id);
+    const interview=await getInterviewById(id);
     if(!interview) redirect('/');
-    const feedback=await getFeedbackById({interviewId:id.id,userId:user.id});
+    const feedback=await getFeedbackById({interviewId:id,userId:user.id});
     console.log(feedback)
     
   return (
